@@ -1,5 +1,6 @@
 package xyz.jiwook.board.domain.member.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import xyz.jiwook.board.domain.member.model.LoginVO;
 import xyz.jiwook.board.domain.member.model.MemberEntity;
 import xyz.jiwook.board.domain.member.repository.MemberCRUDRepo;
+import xyz.jiwook.board.global.common.model.CommonDTO;
 
+import java.util.HashMap;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +24,9 @@ class MemberServiceTest {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void clearDatabase() {
@@ -57,6 +63,57 @@ class MemberServiceTest {
         Iterable<MemberEntity> memberList = memberCRUDRepo.findAll();
         assertEquals(1, StreamSupport.stream(memberList.spliterator(), false).count());
         assertEquals(loginVO.getUsername(), memberList.iterator().next().getUsername());
+    }
+
+    @DisplayName("로그인프로세스 성공")
+    @Test
+    void loginProcessSuccess() {
+        //given
+        LoginVO loginVO = new LoginVO("username", "password");
+        memberService.createMember(loginVO);
+
+        //when
+        CommonDTO resultDTO = memberService.loginProcess(loginVO);
+        HashMap<String, String> resultData = objectMapper.convertValue(resultDTO.getData(), HashMap.class);
+
+        //then
+        assertTrue(resultDTO.isSuccess());
+        assertTrue(resultData.containsKey("accessToken"));
+        assertNotNull(resultData.get("accessToken"));
+        assertTrue(resultData.containsKey("refreshToken"));
+        assertNotNull(resultData.get("refreshToken"));
+    }
+
+    @DisplayName("존재하지 않는 아이디로 인한 로그인프로세스 실패")
+    @Test
+    void loginProcessFailCausedNotExistUsername() {
+        //given
+        LoginVO loginVO = new LoginVO("username", "password");
+        memberService.createMember(loginVO);
+        LoginVO loginVO2 = new LoginVO("username2", "password");
+
+        //when
+        CommonDTO resultDTO = memberService.loginProcess(loginVO2);
+
+        //then
+        assertFalse(resultDTO.isSuccess());
+        assertEquals("not found username", resultDTO.getMessage());
+    }
+
+    @DisplayName("틀린 비밀번호로 인한 로그인프로세스 실패")
+    @Test
+    void loginProcessFailCausedWrongPassword() {
+        //given
+        LoginVO loginVO = new LoginVO("username", "password");
+        memberService.createMember(loginVO);
+        LoginVO loginVO2 = new LoginVO("username", "password2");
+
+        //when
+        CommonDTO resultDTO = memberService.loginProcess(loginVO2);
+
+        //then
+        assertFalse(resultDTO.isSuccess());
+        assertEquals("wrong password", resultDTO.getMessage());
     }
 
 }
