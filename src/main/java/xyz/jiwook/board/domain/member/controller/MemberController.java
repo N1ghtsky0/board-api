@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.jiwook.board.domain.member.model.LoginVO;
 import xyz.jiwook.board.domain.member.service.MemberService;
+import xyz.jiwook.board.global.common.model.CommonDTO;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,5 +27,16 @@ public class MemberController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginVO loginVO) {
+        CommonDTO resultDTO = memberService.loginProcess(loginVO);
+        if (resultDTO.isSuccess()) {
+            return ResponseEntity.ok(resultDTO);
+        } else {
+            log.warn(resultDTO.getMessage());
+            return ResponseEntity.ok().build();
+        }
     }
 }
