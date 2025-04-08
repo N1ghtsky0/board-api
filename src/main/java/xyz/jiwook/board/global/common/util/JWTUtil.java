@@ -1,21 +1,24 @@
 package xyz.jiwook.board.global.common.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.util.HashMap;
+import java.util.function.Function;
 
 @Component
 public class JWTUtil {
-    private final String SECRET_KEY;
+    private final SecretKey SECRET_KEY;
     private final String ISSUER;
 
     public JWTUtil(@Value("${jwt.secret-key}") String secretKey,
                    @Value("${jwt.issuer}") String issuer) {
-        this.SECRET_KEY = secretKey;
+        this.SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         this.ISSUER = issuer;
     }
 
@@ -45,7 +48,20 @@ public class JWTUtil {
     private String generateToken(HashMap<String, Object> claims) {
         return Jwts.builder()
                 .claims(claims)
-                .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY)))
+                .signWith(SECRET_KEY)
                 .compact();
+    }
+
+    public String extractUsernameFromToken(String token) {
+        return getClaimFromToken(token, Claims::getSubject);
+    }
+
+    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaimsFromToken(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
     }
 }
