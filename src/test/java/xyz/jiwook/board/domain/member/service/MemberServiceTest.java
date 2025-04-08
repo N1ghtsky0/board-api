@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import xyz.jiwook.board.domain.member.model.LoginVO;
 import xyz.jiwook.board.domain.member.model.MemberEntity;
 import xyz.jiwook.board.domain.member.repository.MemberCRUDRepo;
@@ -17,6 +18,7 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Testcontainers
 @SpringBootTest
 class MemberServiceTest {
     @Autowired
