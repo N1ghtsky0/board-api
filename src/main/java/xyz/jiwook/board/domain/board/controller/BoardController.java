@@ -1,15 +1,15 @@
 package xyz.jiwook.board.domain.board.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import xyz.jiwook.board.domain.board.model.BoardVO;
 import xyz.jiwook.board.domain.board.service.BoardService;
 import xyz.jiwook.board.global.common.model.CommonDTO;
+import xyz.jiwook.board.global.common.model.SearchVO;
 
 import java.security.Principal;
 
@@ -29,4 +29,12 @@ public class BoardController {
             return ResponseEntity.ok(commonDTO.getMessage());
         }
     }
+
+    @GetMapping
+    public ResponseEntity<?> getBoardList(@RequestBody(required = false) SearchVO searchVO,
+                                          @RequestParam(value = "page", defaultValue = "0") int nowPage) {
+        Pageable pageable = PageRequest.of(nowPage, 20);
+        return ResponseEntity.ok(boardService.searchBoardList(searchVO, pageable));
+    }
+
 }
