@@ -29,7 +29,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
         if (accessToken != null) {
             String username;
             try {
-                username = jwtUtil.extractUsernameFromToken(accessToken);
+                username = jwtUtil.extractSubjectFromToken(accessToken);
             } catch (ExpiredJwtException e) {
                 return;
             } catch (Exception e) {

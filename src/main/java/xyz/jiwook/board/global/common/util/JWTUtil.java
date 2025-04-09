@@ -52,7 +52,7 @@ public class JWTUtil {
                 .compact();
     }
 
-    public String extractUsernameFromToken(String token) {
+    public String extractSubjectFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 

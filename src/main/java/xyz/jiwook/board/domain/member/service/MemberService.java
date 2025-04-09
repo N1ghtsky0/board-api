@@ -32,7 +32,7 @@ public class MemberService {
         if (member == null) { return CommonDTO.fail("not found username"); }
         if (!passwordEncoder.matches(loginVO.getPassword(), member.getPassword())) { return CommonDTO.fail("wrong password"); }
         HashMap<String, String> data = new HashMap<>();
-        data.put("accessToken", jwtUtil.generateAccessToken(member.getUsername()));
+        data.put("accessToken", jwtUtil.generateAccessToken(member.getUuid()));
         data.put("refreshToken", jwtUtil.generateRefreshToken());
 
         return CommonDTO.success(data);

@@ -18,7 +18,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final MemberCRUDRepo memberCRUDRepo;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        MemberEntity member = memberCRUDRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        MemberEntity member = memberCRUDRepo.findByUuid(username).orElseThrow(() -> new UsernameNotFoundException(username));
         return new User(member.getUsername(), member.getPassword(), Collections.singleton(new SimpleGrantedAuthority("USER")));
     }
 }
