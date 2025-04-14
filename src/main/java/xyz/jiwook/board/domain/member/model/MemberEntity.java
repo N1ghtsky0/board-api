@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import xyz.jiwook.board.global.common.model.BaseTimeEntity;
+import xyz.jiwook.board.global.common.model.CommonDTO;
 
 import java.util.UUID;
 
@@ -30,5 +31,13 @@ public class MemberEntity extends BaseTimeEntity {
         this.uuid = UUID.randomUUID().toString();
         this.username = loginVO.getUsername();
         this.password = passwordEncoder.encode(loginVO.getPassword());
+    }
+
+    public CommonDTO changePassword(String currentPassword, String newPassword, PasswordEncoder passwordEncoder) {
+        if (passwordEncoder.matches(currentPassword, password)) {
+            this.password = passwordEncoder.encode(newPassword);
+            return CommonDTO.success();
+        }
+        return CommonDTO.fail("wrong password");
     }
 }

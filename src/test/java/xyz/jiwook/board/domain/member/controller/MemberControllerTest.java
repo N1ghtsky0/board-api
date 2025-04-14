@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import xyz.jiwook.board.domain.member.model.ChangePasswordVO;
 import xyz.jiwook.board.domain.member.model.LoginVO;
 import xyz.jiwook.board.domain.member.model.MemberEntity;
 import xyz.jiwook.board.domain.member.repository.MemberCRUDRepo;
@@ -39,6 +41,9 @@ class MemberControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void clearDatabase() {
@@ -151,6 +156,38 @@ class MemberControllerTest {
         result.andExpect(status().isOk());
         String ResponseBody = result.andReturn().getResponse().getContentAsString();
         assertTrue(ResponseBody.isEmpty());
+    }
+
+    @DisplayName("비밀번호 변경 성공")
+    @Test
+    void changePasswordSuccess() throws Exception {
+        //given
+        final String url = "/user/my/changePassword";
+        LoginVO loginVO = new LoginVO("username", "password");
+        memberService.createMember(loginVO);
+        String loginResponse = mvc.perform(post("/user/login")
+                        .content(objectMapper.writeValueAsString(loginVO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(loginResponse).path("data").path("accessToken").asText();
+        ChangePasswordVO changePasswordVO = new ChangePasswordVO("password", "password2", "password2");
+
+        //when
+        ResultActions result = mvc.perform(post(url)
+                        .header("Authorization", "Bearer " + accessToken)
+                        .content(objectMapper.writeValueAsString(changePasswordVO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+        MemberEntity member = memberCRUDRepo.findByUsername(loginVO.getUsername()).orElse(null);
+
+        //then
+        result.andExpect(status().isOk());
+        String ResponseBody = result.andReturn().getResponse().getContentAsString();
+        assertFalse(ResponseBody.isEmpty());
+        HashMap<String, String> resultData = objectMapper.readValue(ResponseBody, HashMap.class);
+        assertEquals("true", String.valueOf(resultData.get("success")));
+        assertNotNull(member);
+        assertTrue(passwordEncoder.matches(changePasswordVO.getNewPassword(), member.getPassword()));
     }
 
 }

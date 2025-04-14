@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import xyz.jiwook.board.domain.member.model.ChangePasswordVO;
 import xyz.jiwook.board.domain.member.model.LoginVO;
 import xyz.jiwook.board.domain.member.model.MemberEntity;
 import xyz.jiwook.board.domain.member.repository.MemberCRUDRepo;
@@ -36,5 +37,18 @@ public class MemberService {
         data.put("refreshToken", jwtUtil.generateRefreshToken());
 
         return CommonDTO.success(data);
+    }
+
+    public CommonDTO changePassword(String username, ChangePasswordVO changePasswordVO) {
+        MemberEntity member = memberCRUDRepo.findByUsername(username).orElse(null);
+        if (member == null) { return CommonDTO.fail("not found username"); }
+        try {
+            CommonDTO result = member.changePassword(changePasswordVO.getCurrentPassword(), changePasswordVO.getNewPassword(), passwordEncoder);
+            memberCRUDRepo.save(member);
+            return result;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return CommonDTO.fail("eternal server error");
+        }
     }
 }

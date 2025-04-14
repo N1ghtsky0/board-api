@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import xyz.jiwook.board.domain.member.model.ChangePasswordVO;
 import xyz.jiwook.board.domain.member.model.LoginVO;
 import xyz.jiwook.board.domain.member.service.MemberService;
 import xyz.jiwook.board.global.common.model.CommonDTO;
+
+import java.security.Principal;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,6 +40,15 @@ public class MemberController {
         } else {
             log.warn(resultDTO.getMessage());
             return ResponseEntity.ok().build();
+        }
+    }
+
+    @PostMapping("/my/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordVO changePasswordVO, Principal principal) {
+        if (changePasswordVO.validateNewPassword()) {
+            return ResponseEntity.ok(memberService.changePassword(principal.getName(), changePasswordVO));
+        } else {
+            return ResponseEntity.ok(CommonDTO.fail("different password"));
         }
     }
 }
