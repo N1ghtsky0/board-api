@@ -3,11 +3,9 @@ package xyz.jiwook.board.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import xyz.jiwook.board.vo.UsernamePasswordVO;
 
@@ -20,9 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 class UserControllerTest extends CommonTestController{
-    @Autowired
-    private MockMvc mvc;
-
     @Test
     @DisplayName("회원가입")
     void register() throws Exception {

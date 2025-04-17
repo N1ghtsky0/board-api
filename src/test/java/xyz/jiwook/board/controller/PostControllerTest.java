@@ -3,11 +3,9 @@ package xyz.jiwook.board.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import xyz.jiwook.board.vo.PostVO;
 
@@ -18,10 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PostController.class)
-class PostControllerTest extends CommonTestController{
-    @Autowired
-    private MockMvc mvc;
-
+class PostControllerTest extends CommonTestController {
     @Test
     @WithMockUser
     @DisplayName("게시글 작성")
