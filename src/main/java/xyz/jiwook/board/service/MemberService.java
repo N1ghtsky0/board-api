@@ -8,6 +8,7 @@ import xyz.jiwook.board.dao.MemberRepo;
 import xyz.jiwook.board.entity.MemberEntity;
 import xyz.jiwook.board.util.TokenUtil;
 import xyz.jiwook.board.vo.TokenVO;
+import xyz.jiwook.board.vo.UserInfoVO;
 import xyz.jiwook.board.vo.UsernamePasswordVO;
 
 @RequiredArgsConstructor
@@ -29,9 +30,15 @@ public class MemberService {
     @Transactional(readOnly = true)
     public TokenVO loginProcess(UsernamePasswordVO usernamePasswordVO) {
         MemberEntity memberEntity = memberRepo.findByUsername(usernamePasswordVO.getUsername()).orElse(new MemberEntity());
-        if (!passwordEncoder.matches(usernamePasswordVO.getPassword(), memberEntity.getPassword())) {
+        if (memberEntity.getUsername() == null ||
+                !passwordEncoder.matches(usernamePasswordVO.getPassword(), memberEntity.getPassword())) {
             return new TokenVO();
         }
         return new TokenVO(tokenUtil.generateAccessToken(memberEntity.getUsername()), tokenUtil.generateRefreshToken());
+    }
+
+    @Transactional(readOnly = true)
+    public UserInfoVO findUserInfoByUsername(String username) {
+        return memberRepo.selectUserInfoByUsername(username);
     }
 }

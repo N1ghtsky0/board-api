@@ -3,10 +3,10 @@ package xyz.jiwook.board.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import xyz.jiwook.board.service.MemberService;
 import xyz.jiwook.board.vo.ResponseVO;
-import xyz.jiwook.board.vo.UserInfoVO;
 import xyz.jiwook.board.vo.UsernamePasswordVO;
 
 @RequiredArgsConstructor
@@ -31,13 +31,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ResponseVO> myInfo() {
-        UserInfoVO userInfoVO = new UserInfoVO();
-        userInfoVO.setKickName("mock kickName");
-        userInfoVO.setThumbnail("mock thumbnail");
-        userInfoVO.setIntroduce("mock introduce");
-        userInfoVO.setRegDt("mock regDt");
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseVO.success(userInfoVO));
+    public ResponseEntity<ResponseVO> myInfo(Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseVO.success(memberService.findUserInfoByUsername(authentication.getName())));
     }
 
     @PostMapping("/users/{id}/follow")
