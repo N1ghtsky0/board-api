@@ -9,8 +9,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 import xyz.jiwook.board.vo.PostVO;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class PostControllerTest extends CommonTestController {
     @Test
-    @WithMockUser
     @DisplayName("게시글 작성")
     void createPost() throws Exception {
         //given
@@ -26,11 +24,10 @@ class PostControllerTest extends CommonTestController {
         PostVO postVO = new PostVO();
         postVO.setTitle("mock title");
         postVO.setContent("mock content");
-        final String ACCESS_TOKEN = "test token";
 
         //when
         ResultActions result = mvc.perform(post(URI)
-                        .header("Authorization", "Bearer " + ACCESS_TOKEN)
+                        .header("Authorization", "Bearer " + USABLE_ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(postVO)))
                 .andDo(print());
@@ -39,6 +36,8 @@ class PostControllerTest extends CommonTestController {
         result.andExpect(status().isCreated());
         JsonNode jsonNode = objectMapper.readTree(result.andReturn().getResponse().getContentAsString());
         assertTrue(jsonNode.path("success").asBoolean());
+        assertEquals(postVO.getTitle(), jsonNode.path("data").path("title").asText());
+        assertEquals(postVO.getContent(), jsonNode.path("data").path("content").asText());
     }
 
     @Test
