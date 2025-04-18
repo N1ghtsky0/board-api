@@ -1,12 +1,17 @@
 package xyz.jiwook.board.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
+import xyz.jiwook.board.dao.MemberRepo;
+import xyz.jiwook.board.entity.MemberEntity;
 import xyz.jiwook.board.vo.UsernamePasswordVO;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,6 +23,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 class UserControllerTest extends CommonTestController{
+    @Autowired
+    private MemberRepo memberRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private final String TEST_USERNAME = "testUsername";
+    private final String TEST_PASSWORD = "testPassword";
+
+    @BeforeEach
+    public void DatabaseSetUp() {
+        memberRepo.deleteAll();
+        memberRepo.save(MemberEntity.builder()
+                .username(TEST_USERNAME)
+                .password(passwordEncoder.encode(TEST_PASSWORD))
+                .nickname(TEST_USERNAME)
+                .build());
+    }
+
     @Test
     @DisplayName("회원가입")
     void register() throws Exception {
@@ -45,8 +69,8 @@ class UserControllerTest extends CommonTestController{
         //given
         final String URI = "/user/login";
         UsernamePasswordVO usernamePasswordVO = new UsernamePasswordVO();
-        usernamePasswordVO.setUsername("mock username");
-        usernamePasswordVO.setPassword("mock password");
+        usernamePasswordVO.setUsername(TEST_USERNAME);
+        usernamePasswordVO.setPassword(TEST_PASSWORD);
 
         //when
         ResultActions result = mvc.perform(post(URI)
@@ -58,8 +82,8 @@ class UserControllerTest extends CommonTestController{
         result.andExpect(status().isOk());
         JsonNode jsonNode = objectMapper.readTree(result.andReturn().getResponse().getContentAsString());
         assertTrue(jsonNode.path("success").asBoolean());
-        assertFalse(jsonNode.path("data").path("accessToken").asText().isEmpty());
-        assertFalse(jsonNode.path("data").path("refreshToken").asText().isEmpty());
+        assertTrue(!jsonNode.path("data").path("accessToken").isNull() && !jsonNode.path("data").path("accessToken").asText().isEmpty());
+        assertTrue(!jsonNode.path("data").path("refreshToken").isNull() && !jsonNode.path("data").path("refreshToken").asText().isEmpty());
     }
 
     @Test
