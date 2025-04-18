@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import xyz.jiwook.board.vo.UserInfoVO;
 
 @Getter
 @NoArgsConstructor
@@ -28,4 +29,10 @@ public class MemberEntity extends BaseEntity {
     private String introduction;
 
     private String profileImage;
+
+    public void updateProfile(UserInfoVO userInfoVO) {
+        this.nickname = userInfoVO.getKickName();
+        this.introduction = userInfoVO.getIntroduce();
+        this.profileImage = userInfoVO.getThumbnail();
+    }
 }
