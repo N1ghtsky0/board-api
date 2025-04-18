@@ -1,13 +1,15 @@
 package xyz.jiwook.board.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
-import java.util.Base64;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.function.Function;
 
 @Component
 public class TokenUtil {
@@ -32,7 +34,20 @@ public class TokenUtil {
                 .compact();
     }
 
-    private Key getSecretKey() {
-        return Keys.hmacShaKeyFor(Base64.getDecoder().decode(SECRET_KEY));
+    private SecretKey getSecretKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String extractSubjectFromToken(String token) {
+        return getClaimFromToken(token, Claims::getSubject);
+    }
+
+    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaimsFromToken(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
     }
 }
