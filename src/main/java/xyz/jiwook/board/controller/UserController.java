@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import xyz.jiwook.board.service.MemberService;
 import xyz.jiwook.board.vo.ResponseVO;
-import xyz.jiwook.board.vo.TokenVO;
 import xyz.jiwook.board.vo.UserInfoVO;
 import xyz.jiwook.board.vo.UsernamePasswordVO;
 
@@ -23,10 +22,7 @@ public class UserController {
 
     @PostMapping("/user/login")
     public ResponseEntity<ResponseVO> login(@RequestBody UsernamePasswordVO usernamePasswordVO) {
-        TokenVO tokenVO = new TokenVO();
-        tokenVO.setAccessToken("mock accessToken");
-        tokenVO.setRefreshToken("mock refreshToken");
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseVO.success(tokenVO));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseVO.success(memberService.loginProcess(usernamePasswordVO)));
     }
 
     @PostMapping("/user/logout")
