@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import xyz.jiwook.board.entity.MemberEntity;
 import xyz.jiwook.board.service.PostService;
+import xyz.jiwook.board.util.LoginMember;
 import xyz.jiwook.board.vo.PostVO;
 import xyz.jiwook.board.vo.ResponseVO;
 
@@ -33,7 +35,11 @@ public class PostController {
     }
 
     @PostMapping("/posts/{id}")
-    public ResponseEntity<ResponseVO> updatePost(@PathVariable("id") Long id, @RequestBody PostVO postVO) {
+    public ResponseEntity<ResponseVO> updatePost(@PathVariable("id") Long id,
+                                                 @RequestBody PostVO postVO,
+                                                 @LoginMember MemberEntity memberEntity) {
+        postVO.setId(id);
+        postService.updatePost(postVO, memberEntity);
         return ResponseEntity.ok(ResponseVO.success());
     }
 

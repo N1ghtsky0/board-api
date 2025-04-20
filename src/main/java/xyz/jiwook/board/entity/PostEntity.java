@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import xyz.jiwook.board.vo.PostVO;
 
 @Getter
 @NoArgsConstructor
@@ -25,4 +26,10 @@ public class PostEntity extends BaseEntity {
 
     @ManyToOne
     private MemberEntity author;
+
+    public void updatePost(PostVO postVO) {
+        this.title = postVO.getTitle();
+        this.content = postVO.getContent();
+        this.thumbnail = postVO.getThumbnail();
+    }
 }
