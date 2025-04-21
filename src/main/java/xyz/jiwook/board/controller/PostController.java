@@ -1,7 +1,7 @@
 package xyz.jiwook.board.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -11,8 +11,6 @@ import xyz.jiwook.board.service.PostService;
 import xyz.jiwook.board.util.LoginMember;
 import xyz.jiwook.board.vo.PostVO;
 import xyz.jiwook.board.vo.ResponseVO;
-
-import java.util.ArrayList;
 
 @RequiredArgsConstructor
 @RestController
@@ -30,8 +28,8 @@ public class PostController {
     public ResponseEntity<ResponseVO> getPosts(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                @RequestParam(value = "size", required = false, defaultValue = "20") int size,
                                                @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword) {
-        PageImpl<PostVO> postVOPage = new PageImpl<>(new ArrayList<>());
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseVO.success(postVOPage));
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseVO.success(postService.searchPosts(pageable, keyword)));
     }
 
     @PostMapping("/posts/{id}")

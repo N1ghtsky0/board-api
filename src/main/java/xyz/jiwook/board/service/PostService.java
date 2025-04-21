@@ -1,6 +1,8 @@
 package xyz.jiwook.board.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,11 @@ public class PostService {
                 .author(memberRepo.findByUsername(postVO.getAuthor()).orElseThrow(() -> new UsernameNotFoundException(postVO.getAuthor())))
                 .thumbnail(postVO.getThumbnail())
                 .build()).getId();
+    }
+
+    @Transactional(readOnly = true)
+    public PageImpl<PostVO> searchPosts(Pageable pageable, String keyword) {
+        return (PageImpl<PostVO>) postRepo.searchPostList(pageable, keyword);
     }
 
     @Transactional(rollbackFor = Exception.class)
