@@ -34,4 +34,5 @@ public abstract class BaseEntity {
 
     @Column(nullable = false)
     private boolean deleted = false;
+    private String deletedReason;
 }

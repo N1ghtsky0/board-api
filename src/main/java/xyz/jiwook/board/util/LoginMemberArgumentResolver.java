@@ -3,7 +3,6 @@ package xyz.jiwook.board.util;
 import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -26,7 +25,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
                                   @Nullable ModelAndViewContainer mavContainer,
                                   @NonNull NativeWebRequest webRequest,
                                   @Nullable WebDataBinderFactory binderFactory) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ((UserDetailsImpl) authentication.getDetails()).memberEntity();
+        return ((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getDetails()).accountEntity();
     }
 }

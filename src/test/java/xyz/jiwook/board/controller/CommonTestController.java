@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import xyz.jiwook.board.RestDocsConfiguration;
 import xyz.jiwook.board.dao.MemberRepo;
+import xyz.jiwook.board.dao.PostRepo;
 import xyz.jiwook.board.entity.MemberEntity;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -34,6 +35,8 @@ public abstract class CommonTestController {
     protected PasswordEncoder passwordEncoder;
     @Autowired
     private MemberRepo memberRepo;
+    @Autowired
+    protected PostRepo postRepo;
 
     protected static final String TEST_USERNAME = "testUsername";
     protected static final String TEST_PASSWORD = "testPassword";
@@ -56,11 +59,8 @@ public abstract class CommonTestController {
 
     @BeforeEach
     public void DatabaseSetUp() {
+        postRepo.deleteAll();
         memberRepo.deleteAll();
-        memberRepo.save(MemberEntity.builder()
-                .username(TEST_USERNAME)
-                .password(passwordEncoder.encode(TEST_PASSWORD))
-                .nickname(TEST_USERNAME)
-                .build());
+        memberRepo.save(new MemberEntity(TEST_USERNAME, passwordEncoder.encode(TEST_PASSWORD)));
     }
 }

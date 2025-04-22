@@ -20,17 +20,13 @@ public class MemberService {
 
     @Transactional(rollbackFor = Exception.class)
     public void createMember(UsernamePasswordVO usernamePasswordVO) {
-        memberRepo.save(MemberEntity.builder()
-                .username(usernamePasswordVO.getUsername())
-                .password(passwordEncoder.encode(usernamePasswordVO.getPassword()))
-                .nickname(usernamePasswordVO.getUsername())
-                .build());
+        memberRepo.save(new MemberEntity(usernamePasswordVO.getUsername(), passwordEncoder.encode(usernamePasswordVO.getPassword())));
     }
 
     @Transactional(readOnly = true)
     public TokenVO loginProcess(UsernamePasswordVO usernamePasswordVO) {
-        MemberEntity memberEntity = memberRepo.findByUsername(usernamePasswordVO.getUsername()).orElse(new MemberEntity());
-        if (memberEntity.getUsername() == null ||
+        MemberEntity memberEntity = memberRepo.findByUsername(usernamePasswordVO.getUsername()).orElse(null);
+        if (memberEntity == null ||
                 !passwordEncoder.matches(usernamePasswordVO.getPassword(), memberEntity.getPassword())) {
             return new TokenVO();
         }
