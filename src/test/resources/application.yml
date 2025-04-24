@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/test
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+jwt:
+  secret-key: k2wqJ7JXdFAYomknPS6Ykve6w7M9XcZnDwWLnfr7rasF0FosCZNQVGP3JQCp3ONDfzNH10xVn8GlczDtXz3k0WyuI1UDy5SVA9P8xwIZyzlSwO3dsvNxClQQL08vgrkO
