@@ -1,10 +1,10 @@
-package xyz.jiwook.board;
+package xyz.jiwook.toyBoard;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BoardApplicationTests {
+class ToyBoardApplicationTests {
 
 	@Test
 	void contextLoads() {
