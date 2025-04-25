@@ -10,7 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import xyz.jiwook.toyBoard.config.exceptionConfig.CustomInvalidJwtException;
+import xyz.jiwook.toyBoard.config.exceptionConfig.GlobalExceptionHandler;
 import xyz.jiwook.toyBoard.entity.BaseAccountEntity;
 import xyz.jiwook.toyBoard.service.TokenService;
 import xyz.jiwook.toyBoard.util.HttpContextUtils;
@@ -32,7 +32,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String accessToken = httpContextUtils.extractAccessToken(request);
         if (accessToken != null) {
             if (tokenService.ExtractExpirationFromToken(accessToken).before(new Date())) {
-                throw new CustomInvalidJwtException("엑세스 토큰이 만료되었습니다.");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("엑세스 토큰이 만료되었습니다.");
+                return;
             }
             String username = tokenService.ExtractSubjectFromToken(accessToken);
             BaseAccountEntity loginAccount = (BaseAccountEntity) userDetailsService.loadUserByUsername(username);
