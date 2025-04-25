@@ -12,12 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import xyz.jiwook.toyBoard.dao.AccountRepo;
+import xyz.jiwook.toyBoard.dao.RefreshTokenRepo;
+import xyz.jiwook.toyBoard.entity.RefreshTokenEntity;
 import xyz.jiwook.toyBoard.service.MemberService;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
 import xyz.jiwook.toyBoard.vo.request.RegisterVO;
+import xyz.jiwook.toyBoard.vo.request.TokenVO;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,6 +35,8 @@ class AuthControllerTest {
     private MemberService memberService;
     @Autowired
     private AccountRepo accountRepo;
+    @Autowired
+    private RefreshTokenRepo refreshTokenRepo;
 
     @BeforeEach
     public void setUp() {
@@ -208,5 +212,30 @@ class AuthControllerTest {
         result.andExpect(status().isOk());
         JsonNode jsonNode = objectMapper.readTree(result.andReturn().getResponse().getContentAsString());
         assertTrue(jsonNode.has("accessToken") && jsonNode.has("refreshToken"));
+    }
+
+    @Test
+    @DisplayName("토큰 재발급 성공")
+    void reGenerateToken_success() throws Exception {
+        // given
+        String uri = "/auth/token/refresh";
+        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VybmFtZSIsImlhdCI6MTc0NTU0NzkzMSwiZXhwIjoxNzQ1NTQ3OTMxfQ.2u6bCJIvmLTjzMH9hzPKCNU8VCVNPIixAFA0zp1_CKsJ7huv0_J6KrLoBJo-HBX69iTmpUeweS_4XyeBsESr0Q";
+        String refreshToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZWZyZXNoVG9rZW4iLCJpYXQiOjE3NDU1NDM1NTcsImV4cCI6MTc0NjE0ODM1N30.p5QP5zK2uL-hrcc1qwVRazX23kAdtlQ-b8MdwPXdOhaBJjFVhi4AkB19ynbv3RKDHfcIouzJbz2Wo_SpUlkySg";
+        TokenVO requestTokenVO = new TokenVO();
+        requestTokenVO.setAccessToken(accessToken);
+        requestTokenVO.setRefreshToken(refreshToken);
+        refreshTokenRepo.save(new RefreshTokenEntity(refreshToken, "127.0.0.1", "username"));
+
+        // when
+        ResultActions result = mockMvc.perform(post(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestTokenVO)))
+                .andDo(print());
+
+        // then
+        result.andExpect(status().isOk());
+        JsonNode jsonNode = objectMapper.readTree(result.andReturn().getResponse().getContentAsString());
+        assertTrue(jsonNode.has("accessToken") && jsonNode.has("refreshToken"));
+        assertFalse(jsonNode.path("accessToken").asText().isEmpty());
     }
 }

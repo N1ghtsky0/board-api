@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(CustomInvalidJwtException.class)
+    public ResponseEntity<?> handleCustomInvalidRefreshTokenException(CustomInvalidJwtException e) {
+        return new ResponseEntity<>(e.getMessage(), null, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(CustomLoginFailException.class)
     public ResponseEntity<?> handleCustomLoginFailException(CustomLoginFailException e) {
         String message = "존재하지 않는 아이디 이거나 비밀번호가 틀렸습니다.";

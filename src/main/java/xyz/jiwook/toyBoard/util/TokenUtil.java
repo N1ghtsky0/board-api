@@ -1,5 +1,7 @@
 package xyz.jiwook.toyBoard.util;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import xyz.jiwook.toyBoard.entity.RefreshTokenEntity;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +41,27 @@ public class TokenUtil {
                 .expiration(new Date(now + expireTime))
                 .signWith(getSecretKey())
                 .compact();
+    }
+
+    public String ExtractSubjectFromToken(String token) {
+        return this.extractClaim(token, Claims::getSubject);
+    }
+
+    public Date ExtractExpirationFromToken(String token) {
+        return this.extractClaim(token, Claims::getExpiration);
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        try {
+            return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
     }
 
     private SecretKey getSecretKey() {

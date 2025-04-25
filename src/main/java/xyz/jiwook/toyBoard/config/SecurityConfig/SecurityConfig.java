@@ -2,6 +2,7 @@ package xyz.jiwook.toyBoard.config.SecurityConfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,6 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final String[] POST_PERMIT_ALL_URLS = {"/auth/member/register", "/auth/member/login", "/auth/token/refresh"};
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
@@ -20,7 +23,8 @@ public class SecurityConfig {
         http.sessionManagement(configurer -> configurer
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(requests -> requests
-                .anyRequest().permitAll());
+                .requestMatchers(HttpMethod.POST, POST_PERMIT_ALL_URLS).permitAll()
+                .anyRequest().authenticated());
         return http.build();
     }
 
