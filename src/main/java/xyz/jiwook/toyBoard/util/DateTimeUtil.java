@@ -25,4 +25,8 @@ public class DateTimeUtil {
             return targetDateTime.format(DateTimeFormatter.ofPattern(MONTH_DATE_FORMAT));
         }
     }
+
+    public static String full(LocalDateTime targetDateTime) {
+        return targetDateTime.format(DateTimeFormatter.ofPattern(YEAR_DATE_FORMAT + " " + TIME_FORMAT));
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import xyz.jiwook.toyBoard.config.SecurityConfig.SecurityUtil;
 import xyz.jiwook.toyBoard.dao.PostRepo;
 import xyz.jiwook.toyBoard.entity.PostEntity;
+import xyz.jiwook.toyBoard.vo.reponse.PostDetailVO;
 import xyz.jiwook.toyBoard.vo.reponse.PostSummaryVO;
 import xyz.jiwook.toyBoard.vo.request.EditPostVO;
 
@@ -28,5 +29,9 @@ public class PostService {
 
     public Page<PostSummaryVO> getPostList(Pageable pageable) {
         return postRepo.findAllByDeletedIsFalseOrderByCreatedAtDesc(pageable).map(PostSummaryVO::fromEntity);
+    }
+
+    public PostDetailVO getPost(long postId) {
+        return PostDetailVO.fromEntity(postRepo.findById(postId).orElse(null));
     }
 }
