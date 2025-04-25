@@ -29,7 +29,7 @@ public class TokenService {
 
     public String generateRefreshToken(String username, String ipAddress) {
         String refreshToken = generateToken("refreshToken", 1000L * 60 * 60 * 24 * 7);
-        refreshTokenRepo.save(new RefreshTokenEntity(refreshToken, username, ipAddress));
+        refreshTokenRepo.save(new RefreshTokenEntity(refreshToken, ipAddress, username));
         return refreshToken;
     }
 
