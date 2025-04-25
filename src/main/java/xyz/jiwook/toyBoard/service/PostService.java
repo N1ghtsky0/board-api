@@ -32,7 +32,7 @@ public class PostService {
     }
 
     public PostDetailVO getPost(long postId) {
-        return PostDetailVO.fromEntity(postRepo.findById(postId).orElse(null));
+        return PostDetailVO.fromEntity(postRepo.findByIdAndDeletedIsFalse(postId).orElse(null));
     }
 
     public void updatePost(EditPostVO editPostVO) {

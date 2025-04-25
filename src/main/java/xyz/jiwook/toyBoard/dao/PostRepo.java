@@ -5,6 +5,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import xyz.jiwook.toyBoard.entity.PostEntity;
 
+import java.util.Optional;
+
 public interface PostRepo extends JpaRepository<PostEntity, Long> {
     Page<PostEntity> findAllByDeletedIsFalseOrderByCreatedAtDesc(Pageable pageable);
+
+    Optional<PostEntity> findByIdAndDeletedIsFalse(long id);
 }
