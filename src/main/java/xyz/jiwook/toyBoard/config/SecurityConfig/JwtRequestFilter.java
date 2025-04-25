@@ -13,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.jiwook.toyBoard.config.exceptionConfig.CustomInvalidJwtException;
 import xyz.jiwook.toyBoard.entity.BaseAccountEntity;
 import xyz.jiwook.toyBoard.service.TokenService;
+import xyz.jiwook.toyBoard.util.HttpContextUtils;
 
 import java.io.IOException;
 import java.util.Date;
@@ -22,12 +23,13 @@ import java.util.Date;
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final HttpContextUtils httpContextUtils;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = getAccessTokenFromHeader(request);
+        String accessToken = httpContextUtils.extractAccessToken(request);
         if (accessToken != null) {
             if (tokenService.ExtractExpirationFromToken(accessToken).before(new Date())) {
                 throw new CustomInvalidJwtException("엑세스 토큰이 만료되었습니다.");
@@ -39,14 +41,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
-    }
-
-    private String getAccessTokenFromHeader(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
     }
 
     @Override
