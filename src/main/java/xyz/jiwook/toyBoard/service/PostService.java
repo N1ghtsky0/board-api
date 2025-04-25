@@ -34,4 +34,13 @@ public class PostService {
     public PostDetailVO getPost(long postId) {
         return PostDetailVO.fromEntity(postRepo.findById(postId).orElse(null));
     }
+
+    public void updatePost(EditPostVO editPostVO) {
+        PostEntity postEntity = postRepo.findById(editPostVO.getId()).orElse(null);
+        if (postEntity == null || !securityUtil.hasAuthority(postEntity)) {
+            throw new SecurityException("글을 수정할 권한이 없습니다.");
+        }
+        postEntity.update(editPostVO);
+        postRepo.save(postEntity);
+    }
 }

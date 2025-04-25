@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<?> handleSecurityException(SecurityException e) {
+        return new ResponseEntity<>(e.getMessage(), null, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(CustomInvalidJwtException.class)
     public ResponseEntity<?> handleCustomInvalidRefreshTokenException(CustomInvalidJwtException e) {
         return new ResponseEntity<>(e.getMessage(), null, HttpStatus.BAD_REQUEST);

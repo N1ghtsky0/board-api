@@ -1,10 +1,8 @@
 package xyz.jiwook.toyBoard.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import xyz.jiwook.toyBoard.vo.request.EditPostVO;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,7 +19,7 @@ public class PostEntity extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "author_id", nullable = false, updatable = false)
     private BaseAccountEntity author;
 
     @Builder
@@ -29,5 +27,10 @@ public class PostEntity extends BaseEntity {
         this.title = title;
         this.content = content;
         this.author = author;
+    }
+
+    public void update(EditPostVO editPostVO) {
+        this.title = editPostVO.getTitle();
+        this.content = editPostVO.getContent();
     }
 }
