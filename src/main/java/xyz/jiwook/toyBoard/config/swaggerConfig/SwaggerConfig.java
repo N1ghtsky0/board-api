@@ -1,4 +1,4 @@
-package xyz.jiwook.toyBoard.config;
+package xyz.jiwook.toyBoard.config.swaggerConfig;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
