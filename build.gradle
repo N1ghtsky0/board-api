@@ -43,6 +43,9 @@ dependencies {
 
 	//openAPI swagger-ui
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+
+	//Xss filter
+	implementation 'org.apache.commons:commons-text:1.13.1'
 }
 
 tasks.named('test') {
