@@ -16,6 +16,7 @@ public class HttpContextUtils {
 
     public String extractRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
+        if (cookies == null) { return null; }
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("refresh-token")) {
                 return cookie.getValue();
