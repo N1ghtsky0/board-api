@@ -24,7 +24,8 @@ import xyz.jiwook.toyBoard.vo.request.RegisterVO;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -128,6 +129,7 @@ class PostControllerTest {
                         .author(Objects.requireNonNull(memberRepo.findByUsername("username2").orElse(null)))
                         .build())
                 .getId();
+        assertTrue(postRepo.findById(savedPostSeq).isPresent());
 
         EditPostVO updatePostVO = new EditPostVO();
         updatePostVO.setTitle("title2");
@@ -145,4 +147,40 @@ class PostControllerTest {
         assertEquals("글을 수정할 권한이 없습니다.", result.andReturn().getResponse().getContentAsString());
     }
 
+    @Test
+    @DisplayName("게시글 삭제 성공")
+    void deletePost_success() throws Exception {
+        // given
+        String uri = "/posts/";
+        BaseAccountEntity loginAccount = (BaseAccountEntity) userDetailsService.loadUserByUsername("username");
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginAccount, null, loginAccount.getAuthorities());
+        authentication.setDetails(loginAccount);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        long savedPostSeq = postRepo.save(PostEntity.builder()
+                        .title("title")
+                        .content("content")
+                        .author(Objects.requireNonNull(memberRepo.findByUsername("username").orElse(null)))
+                        .build())
+                .getId();
+        assertTrue(postRepo.findById(savedPostSeq).isPresent());
+
+        EditPostVO updatePostVO = new EditPostVO();
+        updatePostVO.setTitle("title2");
+        updatePostVO.setContent("content2");
+
+        // when
+        ResultActions result = mockMvc.perform(delete(uri + savedPostSeq)
+                        .header("Authorization", ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePostVO)))
+                .andDo(print());
+
+        // then
+        result.andExpect(status().isOk());
+        postRepo.findById(savedPostSeq).ifPresent(deletedPost -> {
+            assertTrue(deletedPost.isDeleted());
+            assertEquals("작성자가 직접 삭제한 글입니다.", deletedPost.getDeletedReason());
+        });
+
+    }
 }

@@ -43,4 +43,13 @@ public class PostService {
         postEntity.update(editPostVO);
         postRepo.save(postEntity);
     }
+
+    public void deletePost(long postId) {
+        PostEntity postEntity = postRepo.findById(postId).orElse(null);
+        if (postEntity == null || !securityUtil.hasAuthority(postEntity)) {
+            throw new SecurityException("글을 삭제할 권한이 없습니다.");
+        }
+        postEntity.delete("작성자가 직접 삭제한 글입니다.");
+        postRepo.save(postEntity);
+    }
 }
