@@ -25,9 +25,11 @@ public class PostController {
     @GetMapping("/posts")
     public ResponseEntity<Page<PostSummaryVO>> getPostList(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(value = "searchType", required = false, defaultValue = "T") String searchType,
+            @RequestParam(value = "searchKeyword", required = false, defaultValue = "") String searchKeyword) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return ResponseEntity.ok(postService.getPostList(pageRequest));
+        return ResponseEntity.ok(postService.searchPostList(pageRequest, searchType, searchKeyword));
     }
 
     @GetMapping("/posts/{id}")
