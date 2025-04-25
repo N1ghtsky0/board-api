@@ -9,7 +9,6 @@ import xyz.jiwook.toyBoard.dao.MemberRepo;
 import xyz.jiwook.toyBoard.dao.RefreshTokenRepo;
 import xyz.jiwook.toyBoard.entity.MemberEntity;
 import xyz.jiwook.toyBoard.entity.RefreshTokenEntity;
-import xyz.jiwook.toyBoard.util.TokenUtil;
 import xyz.jiwook.toyBoard.vo.reponse.TokenVO;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
 
@@ -20,7 +19,7 @@ import java.util.Date;
 public class AuthService {
     private final MemberRepo memberRepo;
     private final RefreshTokenRepo refreshTokenRepo;
-    private final TokenUtil tokenUtil;
+    private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
     public String loginProcess(LoginVO loginVO) {
@@ -42,16 +41,16 @@ public class AuthService {
     }
 
     public TokenVO reGenerateToken(xyz.jiwook.toyBoard.vo.request.TokenVO oldTokenVO, String ipAddress) {
-        String username = tokenUtil.ExtractSubjectFromToken(oldTokenVO.getAccessToken());
+        String username = tokenService.ExtractSubjectFromToken(oldTokenVO.getAccessToken());
         RefreshTokenEntity savedRefreshToken = refreshTokenRepo.findByTokenAndUsername(oldTokenVO.getRefreshToken(), username)
                 .orElseThrow(() -> new CustomInvalidJwtException("유효하지 않은 리프레쉬 토큰입니다."));
         long after3DaysByNow = System.currentTimeMillis() + 3 * 24 * 60 * 60 * 1000L;
-        boolean needToGenerateNewRefreshToken = tokenUtil.ExtractExpirationFromToken(oldTokenVO.getRefreshToken()).before(new Date(after3DaysByNow));
-        String newAccessToken = tokenUtil.generateAccessToken(username);
+        boolean needToGenerateNewRefreshToken = tokenService.ExtractExpirationFromToken(oldTokenVO.getRefreshToken()).before(new Date(after3DaysByNow));
+        String newAccessToken = tokenService.generateAccessToken(username);
         String newRefreshToken = null;
         if (needToGenerateNewRefreshToken) {
             refreshTokenRepo.delete(savedRefreshToken);
-            newRefreshToken = tokenUtil.generateRefreshToken(username, ipAddress);
+            newRefreshToken = tokenService.generateRefreshToken(username, ipAddress);
         }
         return new TokenVO(newAccessToken, newRefreshToken);
     }

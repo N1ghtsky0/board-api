@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.jiwook.toyBoard.service.AuthService;
 import xyz.jiwook.toyBoard.service.MemberService;
-import xyz.jiwook.toyBoard.util.TokenUtil;
+import xyz.jiwook.toyBoard.service.TokenService;
 import xyz.jiwook.toyBoard.vo.reponse.TokenVO;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
 import xyz.jiwook.toyBoard.vo.request.RegisterVO;
@@ -21,7 +21,7 @@ import xyz.jiwook.toyBoard.vo.request.RegisterVO;
 public class AuthController extends CommonController {
     private final AuthService authService;
     private final MemberService memberService;
-    private final TokenUtil tokenUtil;
+    private final TokenService tokenService;
 
     @PostMapping("/member/register")
     public ResponseEntity<Void> register(@RequestBody @Valid RegisterVO registerVO) {
@@ -32,8 +32,8 @@ public class AuthController extends CommonController {
     @PostMapping("/member/login")
     public ResponseEntity<TokenVO> login(@RequestBody @Valid LoginVO loginVO, HttpServletRequest request) {
         String loginUsername = authService.loginProcess(loginVO);
-        String accessToken = tokenUtil.generateAccessToken(loginUsername);
-        String refreshToken = tokenUtil.generateRefreshToken(loginUsername, getClientIpAddress(request));
+        String accessToken = tokenService.generateAccessToken(loginUsername);
+        String refreshToken = tokenService.generateRefreshToken(loginUsername, getClientIpAddress(request));
         return ResponseEntity.ok(new TokenVO(accessToken, refreshToken));
     }
 

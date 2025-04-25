@@ -1,4 +1,4 @@
-package xyz.jiwook.toyBoard.util;
+package xyz.jiwook.toyBoard.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
-public class TokenUtil {
+public class TokenService {
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
 
