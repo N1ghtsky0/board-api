@@ -13,23 +13,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<?> handleBusinessException(BusinessException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        log.warn("Business Exception: {{}}, message: {}", errorCode.toString(), e.getMessage());
+        return ResponseEntity.status(errorCode.getStatus()).body(errorCode.toResponseBody());
+    }
+
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<?> handleSecurityException(SecurityException e) {
         return new ResponseEntity<>(e.getMessage(), null, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(CustomInvalidJwtException.class)
-    public ResponseEntity<?> handleCustomInvalidRefreshTokenException(CustomInvalidJwtException e) {
-        return new ResponseEntity<>(e.getMessage(), null, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(CustomLoginFailException.class)
-    public ResponseEntity<?> handleCustomLoginFailException(CustomLoginFailException e) {
-        String message = "존재하지 않는 아이디 이거나 비밀번호가 틀렸습니다.";
-        if (e.getMessage() != null && !e.getMessage().isEmpty()) {
-            message = e.getMessage();
-        }
-        return new ResponseEntity<>(message, null, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

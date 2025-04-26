@@ -1,5 +1,6 @@
 package xyz.jiwook.toyBoard.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,7 +145,8 @@ class PostControllerTest {
 
         // then
         result.andExpect(status().isBadRequest());
-        assertEquals("글을 수정할 권한이 없습니다.", result.andReturn().getResponse().getContentAsString());
+        JsonNode jsonNode = objectMapper.readTree(result.andReturn().getResponse().getContentAsString());
+        assertEquals("수정할 수 있는 권한이 없습니다.", jsonNode.path("message").asText());
     }
 
     @Test

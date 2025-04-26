@@ -7,6 +7,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import xyz.jiwook.toyBoard.config.exceptionConfig.BusinessException;
+import xyz.jiwook.toyBoard.config.exceptionConfig.ErrorCode;
 import xyz.jiwook.toyBoard.dao.RefreshTokenRepo;
 import xyz.jiwook.toyBoard.entity.RefreshTokenEntity;
 
@@ -61,6 +63,8 @@ public class TokenService {
             return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
     }
 

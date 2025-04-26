@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import xyz.jiwook.toyBoard.config.SecurityConfig.SecurityUtil;
+import xyz.jiwook.toyBoard.config.exceptionConfig.BusinessException;
 import xyz.jiwook.toyBoard.dao.PostRepo;
 import xyz.jiwook.toyBoard.entity.PostEntity;
 import xyz.jiwook.toyBoard.vo.reponse.PostDetailVO;
@@ -14,6 +15,8 @@ import xyz.jiwook.toyBoard.vo.request.EditPostVO;
 
 import java.util.ArrayList;
 import java.util.Objects;
+
+import static xyz.jiwook.toyBoard.config.exceptionConfig.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -60,7 +63,7 @@ public class PostService {
     public void updatePost(EditPostVO editPostVO) {
         PostEntity postEntity = postRepo.findById(editPostVO.getId()).orElse(null);
         if (postEntity == null || !securityUtil.hasAuthority(postEntity)) {
-            throw new SecurityException("글을 수정할 권한이 없습니다.");
+            throw new BusinessException(NO_AUTHORITY);
         }
         postEntity.update(editPostVO);
         postRepo.save(postEntity);
@@ -69,7 +72,7 @@ public class PostService {
     public void deletePost(long postId) {
         PostEntity postEntity = postRepo.findById(postId).orElse(null);
         if (postEntity == null || !securityUtil.hasAuthority(postEntity)) {
-            throw new SecurityException("글을 삭제할 권한이 없습니다.");
+            throw new BusinessException(NO_AUTHORITY);
         }
         postEntity.delete("작성자가 직접 삭제한 글입니다.");
         postRepo.save(postEntity);
