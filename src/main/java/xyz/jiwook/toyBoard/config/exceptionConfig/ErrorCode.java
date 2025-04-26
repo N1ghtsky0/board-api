@@ -20,6 +20,8 @@ public enum ErrorCode {
     LOGIN_FAIL_TOO_MANY_FAIL(OK, "A0012", "로그인에 5회 이상 실패하여 임시 잠금 처리된 계정입니다."),
 
     NO_AUTHORITY(BAD_REQUEST, "S0010", "수정할 수 있는 권한이 없습니다."),
+
+    POST_NOT_FOUND_COMMENT(BAD_REQUEST, "C0010", "잘못된 요청입니다."),
     ;
 
     private final HttpStatus status;
