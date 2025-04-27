@@ -9,23 +9,23 @@ import xyz.jiwook.toyBoard.service.ReportService;
 import xyz.jiwook.toyBoard.vo.request.ReportVO;
 
 @RequiredArgsConstructor
-@RestController("/report")
+@RestController
 public class ReportController {
     private final ReportService reportService;
 
-    @PostMapping("/posts")
+    @PostMapping("/report/posts")
     public ResponseEntity<Void> reportPost(@RequestBody ReportVO reportVO) {
         reportService.reportPost(reportVO);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/comments")
+    @PostMapping("/report/comments")
     public ResponseEntity<Void> reportComment(@RequestBody ReportVO reportVO) {
         reportService.reportComment(reportVO);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/users")
+    @PostMapping("/report/users")
     public ResponseEntity<Void> reportUser(@RequestBody ReportVO reportVO) {
         reportService.reportUser(reportVO);
         return ResponseEntity.ok().build();
