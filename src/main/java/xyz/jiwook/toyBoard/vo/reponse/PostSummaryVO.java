@@ -9,6 +9,7 @@ public class PostSummaryVO {
     private long id;
     private String title;
     private String author;
+    private long viewCount;
     private String createdDate;
 
     private PostSummaryVO() {}
@@ -18,6 +19,7 @@ public class PostSummaryVO {
         postSummaryVO.id = postEntity.getId();
         postSummaryVO.title = postEntity.getTitle();
         postSummaryVO.author = postEntity.getCreatedBy();
+        postSummaryVO.viewCount = postEntity.getViewCount();
         postSummaryVO.createdDate = DateTimeUtil.summary(postEntity.getCreatedAt());
         return postSummaryVO;
     }

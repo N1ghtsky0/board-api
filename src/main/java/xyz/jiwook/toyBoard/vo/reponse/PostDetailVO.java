@@ -9,6 +9,7 @@ public class PostDetailVO {
     private long id;
     private String title;
     private String content;
+    private long viewCount;
     private String author;
     private String createdDate;
 
@@ -20,6 +21,7 @@ public class PostDetailVO {
             postDetailVO.id = postEntity.getId();
             postDetailVO.title = postEntity.getTitle();
             postDetailVO.content = postEntity.getContent();
+            postDetailVO.viewCount = postEntity.getViewCount();
             postDetailVO.author = postEntity.getCreatedBy();
             postDetailVO.createdDate = DateTimeUtil.full(postEntity.getCreatedAt());
         }

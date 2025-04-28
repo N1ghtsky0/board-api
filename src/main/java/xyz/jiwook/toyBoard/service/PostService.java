@@ -57,7 +57,12 @@ public class PostService {
     }
 
     public PostDetailVO getPost(long postId) {
-        return PostDetailVO.fromEntity(postRepo.findByIdAndDeletedIsFalse(postId).orElse(null));
+        PostEntity postEntity = postRepo.findByIdAndDeletedIsFalse(postId).orElse(null);
+        if (postEntity != null) {
+            postEntity.view();
+            postRepo.save(postEntity);
+        }
+        return PostDetailVO.fromEntity(postEntity);
     }
 
     public void updatePost(EditPostVO editPostVO) {

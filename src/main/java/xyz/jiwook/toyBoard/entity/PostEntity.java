@@ -18,6 +18,8 @@ public class PostEntity extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    private long viewCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false, updatable = false)
     private BaseAccountEntity author;
@@ -27,10 +29,13 @@ public class PostEntity extends BaseEntity {
         this.title = title;
         this.content = content;
         this.author = author;
+        this.viewCount = 0;
     }
 
     public void update(EditPostVO editPostVO) {
         this.title = editPostVO.getTitle();
         this.content = editPostVO.getContent();
     }
+
+    public void view() { this.viewCount++; }
 }
