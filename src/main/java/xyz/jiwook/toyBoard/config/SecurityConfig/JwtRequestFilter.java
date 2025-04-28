@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
     private final UserDetailsServiceImpl userDetailsService;
     private final HttpContextUtils httpContextUtils;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -31,11 +33,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         String accessToken = httpContextUtils.extractAccessToken(request);
         if (accessToken != null) {
+            if (redisTemplate.hasKey(accessToken)) {
+                returnErrorCode(ErrorCode.LOGOUT_TOKEN, response);
+                return;
+            }
             if (tokenService.ExtractExpirationFromToken(accessToken).before(new Date())) {
-                ErrorCode tokenExpiredErrorCode = ErrorCode.EXPIRED_TOKEN;
-                response.setStatus(tokenExpiredErrorCode.getStatus().value());
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write(tokenExpiredErrorCode.toResponseBody().toString());
+                returnErrorCode(ErrorCode.EXPIRED_TOKEN, response);
                 return;
             }
             String username = tokenService.ExtractSubjectFromToken(accessToken);
@@ -50,5 +53,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         return request.getRequestURI().startsWith("/auth/token/refresh");
+    }
+
+    private void returnErrorCode(ErrorCode errorCode, HttpServletResponse response) throws IOException {
+        response.setStatus(errorCode.getStatus().value());
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(errorCode.toResponseBody().toString());
     }
 }

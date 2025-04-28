@@ -13,6 +13,7 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN(BAD_REQUEST, "T0020", "유효하지 않은 토큰입니다."),
 
     EXPIRED_TOKEN(OK, "T0011", "토큰이 만료되었습니다."),
+    LOGOUT_TOKEN(BAD_REQUEST, "T0012", "유효하지 않은 토큰입니다."),
 
     LOGIN_FAIL_USERNAME_NOT_FOUND(OK, "A0010", "존재하지 않는 아이디 이거나 비밀번호가 틀렸습니다."),
     LOGIN_FAIL_WRONG_PASSWORD(OK, "A0010", "존재하지 않는 아이디 이거나 비밀번호가 틀렸습니다."),

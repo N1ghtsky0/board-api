@@ -1,6 +1,8 @@
 package xyz.jiwook.toyBoard.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import xyz.jiwook.toyBoard.config.exceptionConfig.BusinessException;
@@ -12,6 +14,7 @@ import xyz.jiwook.toyBoard.vo.reponse.TokenVO;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static xyz.jiwook.toyBoard.config.exceptionConfig.ErrorCode.*;
 
@@ -22,6 +25,7 @@ public class AuthService {
     private final RefreshTokenRepo refreshTokenRepo;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * 제공된 인증 정보를 검증하고 사용자 계정 상태를 업데이트하여 로그인을 처리합니다.
@@ -62,5 +66,12 @@ public class AuthService {
             newRefreshToken = tokenService.generateRefreshToken(username, ipAddress);
         }
         return new TokenVO(newAccessToken, newRefreshToken);
+    }
+
+    public void logoutProcess(String accessToken, String refreshToken) {
+        String username = tokenService.ExtractSubjectFromToken(accessToken);
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set(accessToken, "1", 1000L * 60 * 60, TimeUnit.SECONDS);
+        refreshTokenRepo.findByTokenAndUsername(refreshToken, username).ifPresent(refreshTokenRepo::delete);
     }
 }

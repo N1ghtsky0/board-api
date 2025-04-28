@@ -44,16 +44,23 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        authService.logoutProcess(httpContextUtils.extractAccessToken(request), httpContextUtils.extractRefreshToken(request));
+        setRefreshTokenCookie(response, null);
+        setAuthorization(response, null);
+        return ResponseEntity.ok().build();
+    }
+
     private void setAuthorization(HttpServletResponse response, String accessToken) {
-        if (accessToken == null) { return; }
-        response.setHeader("Authorization", "Bearer " + accessToken);
+        response.setHeader("Authorization", accessToken == null ? null : "Bearer " + accessToken);
     }
 
     private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        if (refreshToken == null) { return; }
         Cookie refreshTokenCookie = new Cookie("refresh-token", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(refreshToken == null ? 0 : 60 * 60 * 24 * 7);
         response.addCookie(refreshTokenCookie);
     }
 }
