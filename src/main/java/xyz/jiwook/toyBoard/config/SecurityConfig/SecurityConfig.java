@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final String[] POST_PERMIT_ALL_URLS = {"/auth/member/register", "/auth/member/login", "/auth/token/refresh"};
+    private final String[] POST_PERMIT_ALL_URLS = {"/member/register", "/auth/login", "/auth/token/refresh"};
     private final String[] GET_PERMIT_ALL_URLS = {
             "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
             "/posts", "/posts/**"

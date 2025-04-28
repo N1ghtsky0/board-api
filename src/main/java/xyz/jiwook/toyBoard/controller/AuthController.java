@@ -11,29 +11,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.jiwook.toyBoard.service.AuthService;
-import xyz.jiwook.toyBoard.service.MemberService;
 import xyz.jiwook.toyBoard.service.TokenService;
 import xyz.jiwook.toyBoard.util.HttpContextUtils;
 import xyz.jiwook.toyBoard.vo.reponse.TokenVO;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
-import xyz.jiwook.toyBoard.vo.request.RegisterVO;
 
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 @RestController
 public class AuthController {
     private final AuthService authService;
-    private final MemberService memberService;
     private final TokenService tokenService;
     private final HttpContextUtils httpContextUtils;
 
-    @PostMapping("/member/register")
-    public ResponseEntity<Void> register(@RequestBody @Valid RegisterVO registerVO) {
-        memberService.register(registerVO);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/member/login")
+    @PostMapping("/login")
     public ResponseEntity<TokenVO> login(@RequestBody @Valid LoginVO loginVO, HttpServletRequest request, HttpServletResponse response) {
         String loginUsername = authService.loginProcess(loginVO);
         String accessToken = tokenService.generateAccessToken(loginUsername);

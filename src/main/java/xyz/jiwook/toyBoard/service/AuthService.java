@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import xyz.jiwook.toyBoard.config.exceptionConfig.BusinessException;
-import xyz.jiwook.toyBoard.dao.MemberRepo;
+import xyz.jiwook.toyBoard.dao.AccountRepo;
 import xyz.jiwook.toyBoard.dao.RefreshTokenRepo;
-import xyz.jiwook.toyBoard.entity.MemberEntity;
+import xyz.jiwook.toyBoard.entity.BaseAccountEntity;
 import xyz.jiwook.toyBoard.entity.RefreshTokenEntity;
 import xyz.jiwook.toyBoard.vo.reponse.TokenVO;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
@@ -18,7 +18,7 @@ import static xyz.jiwook.toyBoard.config.exceptionConfig.ErrorCode.*;
 @RequiredArgsConstructor
 @Service
 public class AuthService {
-    private final MemberRepo memberRepo;
+    private final AccountRepo accountRepo;
     private final RefreshTokenRepo refreshTokenRepo;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
@@ -32,21 +32,21 @@ public class AuthService {
      * @throws BusinessException 비활성화된 계정, 비밀번호 만료, 잘못된 인증 정보 등으로 인해 로그인 시도가 실패한 경우
      */
     public String loginProcess(LoginVO loginVO) {
-        MemberEntity memberEntity = memberRepo.findByUsername(loginVO.getUsername()).orElseThrow(() -> new BusinessException(LOGIN_FAIL_USERNAME_NOT_FOUND));
-        if (!memberEntity.isEnabled()) {
-            throw new BusinessException(LOGIN_FAIL_IGNORED_USERNAME, memberEntity.getDeletedReason());
+        BaseAccountEntity accountEntity = accountRepo.findByUsername(loginVO.getUsername()).orElseThrow(() -> new BusinessException(LOGIN_FAIL_USERNAME_NOT_FOUND));
+        if (!accountEntity.isEnabled()) {
+            throw new BusinessException(LOGIN_FAIL_IGNORED_USERNAME, accountEntity.getDeletedReason());
         }
-        if (!memberEntity.isAccountNonExpired()) {
+        if (!accountEntity.isAccountNonExpired()) {
             throw new BusinessException(LOGIN_FAIL_TOO_MANY_FAIL);
         }
-        if (!passwordEncoder.matches(loginVO.getPassword(), memberEntity.getPassword())) {
-            memberEntity.loginFail();
-            memberRepo.save(memberEntity);
+        if (!passwordEncoder.matches(loginVO.getPassword(), accountEntity.getPassword())) {
+            accountEntity.loginFail();
+            accountRepo.save(accountEntity);
             throw new BusinessException(LOGIN_FAIL_WRONG_PASSWORD);
         }
-        memberEntity.loginSuccess();
-        memberRepo.save(memberEntity);
-        return memberEntity.getUsername();
+        accountEntity.loginSuccess();
+        accountRepo.save(accountEntity);
+        return accountEntity.getUsername();
     }
 
     public TokenVO reGenerateToken(String oldAccessToken, String oldRefreshToken, String ipAddress) {
