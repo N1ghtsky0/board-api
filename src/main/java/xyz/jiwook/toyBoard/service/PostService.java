@@ -56,9 +56,9 @@ public class PostService {
         return postRepo.findAllByDeletedIsFalseOrderByCreatedAtDesc(pageable).map(PostSummaryVO::fromEntity);
     }
 
-    public PostDetailVO getPost(long postId) {
+    public PostDetailVO getPost(long postId, boolean increaseViewCount) {
         PostEntity postEntity = postRepo.findByIdAndDeletedIsFalse(postId).orElse(null);
-        if (postEntity != null) {
+        if (postEntity != null && increaseViewCount) {
             postEntity.view();
             postRepo.save(postEntity);
         }

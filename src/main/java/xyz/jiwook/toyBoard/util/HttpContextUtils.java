@@ -15,10 +15,18 @@ public class HttpContextUtils {
     }
 
     public String extractRefreshToken(HttpServletRequest request) {
+        return this.getCookieValue(request, "refresh-cookie");
+    }
+
+    public String extractVisitorId(HttpServletRequest request) {
+        return this.getCookieValue(request, "vid");
+    }
+
+    private String getCookieValue(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) { return null; }
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refresh-token")) {
+            if (cookie.getName().equals(cookieName)) {
                 return cookie.getValue();
             }
         }

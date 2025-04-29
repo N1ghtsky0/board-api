@@ -23,12 +23,14 @@ public class SecurityConfig {
             "/posts", "/posts/**"
     };
     private final JwtRequestFilter jwtRequestFilter;
+    private final VisitorIdCookieFilter visitorIdCookieFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.formLogin(AbstractHttpConfigurer::disable);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(visitorIdCookieFilter, JwtRequestFilter.class);
         http.sessionManagement(configurer -> configurer
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(requests -> requests
