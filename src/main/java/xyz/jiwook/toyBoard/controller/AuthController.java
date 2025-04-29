@@ -28,7 +28,7 @@ public class AuthController {
     private final HttpContextUtils httpContextUtils;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenVO> login(@RequestBody @Valid LoginVO loginVO, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> login(@RequestBody @Valid LoginVO loginVO, HttpServletRequest request, HttpServletResponse response) {
         String loginUsername = authService.loginProcess(loginVO);
         String accessToken = tokenService.generateAccessToken(loginUsername);
         String refreshToken = tokenService.generateRefreshToken(loginUsername, httpContextUtils.getClientIpAddress(request));
@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/token/refresh")
-    public ResponseEntity<TokenVO> reGenerateToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> reGenerateToken(HttpServletRequest request, HttpServletResponse response) {
         String oldAccessToken = httpContextUtils.extractAccessToken(request);
         String oldRefreshToken = httpContextUtils.extractRefreshToken(request);
         TokenVO tokenVO = authService.reGenerateToken(oldAccessToken, oldRefreshToken, httpContextUtils.getClientIpAddress(request));
