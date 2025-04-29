@@ -13,8 +13,8 @@ import xyz.jiwook.toyBoard.entity.RefreshTokenEntity;
 import xyz.jiwook.toyBoard.vo.reponse.TokenVO;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
 
+import java.time.Duration;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import static xyz.jiwook.toyBoard.config.exceptionConfig.ErrorCode.*;
 
@@ -71,7 +71,8 @@ public class AuthService {
     public void logoutProcess(String accessToken, String refreshToken) {
         String username = tokenService.ExtractSubjectFromToken(accessToken);
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(accessToken, "1", 1000L * 60 * 60, TimeUnit.SECONDS);
+        valueOperations.set(accessToken, "logout");
+        redisTemplate.expire(accessToken, Duration.ofHours(1));
         refreshTokenRepo.findByTokenAndUsername(refreshToken, username).ifPresent(refreshTokenRepo::delete);
     }
 }
