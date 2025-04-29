@@ -14,6 +14,8 @@ import xyz.jiwook.toyBoard.util.HttpContextUtils;
 import java.io.IOException;
 import java.util.UUID;
 
+import static xyz.jiwook.toyBoard.util.Constants.VISITOR_COOKIE_NAME;
+
 @RequiredArgsConstructor
 @Component
 public class VisitorIdCookieFilter extends OncePerRequestFilter {
@@ -25,7 +27,7 @@ public class VisitorIdCookieFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         String visitorId = httpContextUtils.extractVisitorId(request);
         if (visitorId == null) {
-            Cookie visitorIdCookie = new Cookie("vid", UUID.randomUUID().toString());
+            Cookie visitorIdCookie = new Cookie(VISITOR_COOKIE_NAME, UUID.randomUUID().toString());
             visitorIdCookie.setHttpOnly(true);
             visitorIdCookie.setPath("/");
             visitorIdCookie.setMaxAge(60 * 60 * 24 * 365);

@@ -4,10 +4,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
+import static xyz.jiwook.toyBoard.util.Constants.*;
+
 @Component
 public class HttpContextUtils {
     public String extractAccessToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
+        String bearerToken = request.getHeader(ACCESS_TOKEN_HEADER_NAME);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
@@ -15,11 +17,11 @@ public class HttpContextUtils {
     }
 
     public String extractRefreshToken(HttpServletRequest request) {
-        return this.getCookieValue(request, "refresh-cookie");
+        return this.getCookieValue(request, REFRESH_TOKEN_COOKIE_NAME);
     }
 
     public String extractVisitorId(HttpServletRequest request) {
-        return this.getCookieValue(request, "vid");
+        return this.getCookieValue(request, VISITOR_COOKIE_NAME);
     }
 
     private String getCookieValue(HttpServletRequest request, String cookieName) {

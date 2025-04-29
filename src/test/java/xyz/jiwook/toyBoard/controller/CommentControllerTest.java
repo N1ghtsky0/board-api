@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static xyz.jiwook.toyBoard.util.Constants.ACCESS_TOKEN_HEADER_NAME;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -85,7 +86,7 @@ class CommentControllerTest {
 
         // when
         ResultActions result = mockMvc.perform(post(uri)
-                        .header("Authorization", ACCESS_TOKEN)
+                        .header(ACCESS_TOKEN_HEADER_NAME, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestBody)))
                 .andDo(print());
@@ -106,7 +107,7 @@ class CommentControllerTest {
 
         // when
         ResultActions result = mockMvc.perform(post(uri)
-                        .header("Authorization", ACCESS_TOKEN)
+                        .header(ACCESS_TOKEN_HEADER_NAME, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestBody)))
                 .andDo(print());

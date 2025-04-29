@@ -18,10 +18,13 @@ import xyz.jiwook.toyBoard.service.MemberService;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
 import xyz.jiwook.toyBoard.vo.request.RegisterVO;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static xyz.jiwook.toyBoard.util.Constants.ACCESS_TOKEN_HEADER_NAME;
+import static xyz.jiwook.toyBoard.util.Constants.REFRESH_TOKEN_COOKIE_NAME;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -64,8 +67,8 @@ class AuthControllerTest {
 
         // then
         result.andExpect(status().isOk());
-        assertNotNull(result.andReturn().getResponse().getHeader("Authorization"));
-        assertNotNull(result.andReturn().getResponse().getCookie("refresh-token"));
+        assertNotNull(result.andReturn().getResponse().getHeader(ACCESS_TOKEN_HEADER_NAME));
+        assertNotNull(result.andReturn().getResponse().getCookie(REFRESH_TOKEN_COOKIE_NAME));
     }
 
     @Test
@@ -77,19 +80,19 @@ class AuthControllerTest {
         String refreshToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZWZyZXNoVG9rZW4iLCJpYXQiOjE3NDU1NDM1NTcsImV4cCI6MTc0NjE0ODM1N30.p5QP5zK2uL-hrcc1qwVRazX23kAdtlQ-b8MdwPXdOhaBJjFVhi4AkB19ynbv3RKDHfcIouzJbz2Wo_SpUlkySg";
         refreshTokenRepo.save(new RefreshTokenEntity(refreshToken, "127.0.0.1", "username"));
 
-        Cookie refreshTokenCookie = new Cookie("refresh-token", refreshToken);
+        Cookie refreshTokenCookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setPath("/");
 
         // when
         ResultActions result = mockMvc.perform(post(uri)
-                        .header("Authorization", "Bearer " + accessToken)
+                        .header(ACCESS_TOKEN_HEADER_NAME, "Bearer " + accessToken)
                         .cookie(refreshTokenCookie))
                 .andDo(print());
 
         // then
         result.andExpect(status().isOk());
-        assertNotNull(result.andReturn().getResponse().getHeader("Authorization"));
-        assertNotEquals(accessToken, result.andReturn().getResponse().getHeader("Authorization"));
+        assertNotNull(result.andReturn().getResponse().getHeader(ACCESS_TOKEN_HEADER_NAME));
+        assertNotEquals(accessToken, result.andReturn().getResponse().getHeader(ACCESS_TOKEN_HEADER_NAME));
     }
 }

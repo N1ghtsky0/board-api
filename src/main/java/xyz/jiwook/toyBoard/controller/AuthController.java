@@ -16,6 +16,9 @@ import xyz.jiwook.toyBoard.util.HttpContextUtils;
 import xyz.jiwook.toyBoard.vo.reponse.TokenVO;
 import xyz.jiwook.toyBoard.vo.request.LoginVO;
 
+import static xyz.jiwook.toyBoard.util.Constants.ACCESS_TOKEN_HEADER_NAME;
+import static xyz.jiwook.toyBoard.util.Constants.REFRESH_TOKEN_COOKIE_NAME;
+
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 @RestController
@@ -53,11 +56,11 @@ public class AuthController {
     }
 
     private void setAuthorization(HttpServletResponse response, String accessToken) {
-        response.setHeader("Authorization", accessToken == null ? null : "Bearer " + accessToken);
+        response.setHeader(ACCESS_TOKEN_HEADER_NAME, accessToken == null ? null : "Bearer " + accessToken);
     }
 
     private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        Cookie refreshTokenCookie = new Cookie("refresh-token", refreshToken);
+        Cookie refreshTokenCookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(refreshToken == null ? 0 : 60 * 60 * 24 * 7);
